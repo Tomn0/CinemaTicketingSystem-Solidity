@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+
+        <div class="buyer">
+          <div class="centered">
+            <h1>Purchase contract</h1>
+
+            <h2 id="Item X">Item X</h2>
+            
+            <div id=price>Price: 0 Wei</div>
+            <!-- <button id="getPrice">Get price</button> -->
+            
+            <h2 id="Item X">Buyer</h2>
+            <div id=buyer_balance>Account balance: 0 Wei</div>
+            <label for="name" class="col-lg-2 control-label">Amount</label>
+            <input id="amount" type="text" value="400">
+    
+            <!-- <label for="name" class="col-lg-2 control-label">Confirm Item Received</label>
+            <input id="confirmItemReceived" type="text"> -->
+    
+            <button id="buyProduct">Buy Product</button>
+            <button id="confirmReceived">ConfirmReceivedItem</button>
+          </div>
+        </div>
+        
+        <div class="seller">
+          <div class="centered">
+            <h2>Seller</h2>
+            <div id=seller_balance>Account balance: 0 Wei</div>
+            <button id="abort">Abort</button>
+          </div>
+        </div>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script>
+
+      const contract_addr = "0xF7Aa5156E269AC9B0Da287527EAD5d7D228Ff85E";
+      const seller_addr = "0x1b78Ec59483593eCB825fc58Ca246adcf25B7cEa";
+      const buyer_addr = "0x9b32e3071Afc3Ada21C1b4A0Cb7Fe07c5F15918D";
+      if (typeof web3 !== 'undefined') {
+          web3 = new Web3(web3.currentProvider);
+      } else {
+          // set the provider you want from Web3.providers
+          web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+      }
+      console.log(web3);
+
+      var ABI = [];
+
+      var CinemaContract = new web3.eth.Contract(ABI, contract_addr, {});
+      web3.eth.defaultAccount = buyer_addr;
+     
+      // var Purchase = PurchaseContract.at('0x5B38Da6a701c568545dCfcB03FcB875f56beddC4');
+      console.log(CinemaContract);
+
+      function getBuyerBalance() {
+        $.when(web3.eth.getBalance(buyer_addr)).done(function (balance) {
+          // console.log("Buyer account balance: ", balance);
+          $( "#buyer_balance" ).text("Account balance: : " + balance + " Wei");
+        });
+      }
+
+      function getSellerBalance() {
+        $.when(web3.eth.getBalance(seller_addr)).done(function (balance) {
+          // console.log("Seller account balance: ", balance);
+          $( "#seller_balance" ).text("Account balance: : " + balance + " Wei");
+        });
+      } 
+
+      function getItemPrice() {
+        $.when(PurchaseContract.methods.price.call().call()).done(function (new_price) {
+          $( "#price" ).text("Price: " + new_price + " Wei");
+        });
+      }
+
+      getBuyerBalance();
+      setInterval(function(){
+        getBuyerBalance() // this will run after every 5 seconds
+      }, 2000);
+      getSellerBalance();
+      setInterval(function(){
+        getSellerBalance() // this will run after every 5 seconds
+      }, 2000);
+      getItemPrice();
+      setInterval(function(){
+        getItemPrice() // this will run after every 5 seconds
+      }, 2000);
+
+      // TODO: help https://bitsofco.de/calling-smart-contract-functions-using-web3-js-call-vs-send/ 
+
+      // PurchaseContract.methods.buyProduct().send({from: buyer_addr, gas: 3000000, value: 400}, function(err, res){console.log(res);console.log(err);});
+      
+      // PurchaseContract.methods.confirmReceivedItem().call()
+
+      
+      // when buyProduct clicked
+      $("#buyProduct").click(function() {        
+        PurchaseContract.methods.buyProduct().send({from: buyer_addr, gas: 3000000, value: $("#amount").val()}, function(err, res){console.log(res);});
+        // getBuyerBalance();
+      });
+
+      $("#confirmReceived").click(function() {
+        PurchaseContract.methods.confirmReceivedItem().send({from: buyer_addr});
+        // getBuyerBalance();
+      });
+
+      $("#abort").click(function() {
+        PurchaseContract.methods.abort().send({from: seller_addr});
+        // getBuyerBalance();
+      });
+   </script>
+
+</body>
+</html>
