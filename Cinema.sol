@@ -4,9 +4,9 @@ pragma solidity ^0.8.17;
 
 contract Ticket {
     uint public price;
-    string public title;
+    string public filmTitle;
     uint public place_id;
-    address public owner; 
+    address public owner;
     address public ticketingSystem; 
 
     enum State {Init, Locked, Inactive, Refund}
@@ -22,7 +22,7 @@ contract Ticket {
         _;
     }
 
-    ///You are not the ticket owner!
+    ///This is not the ticket owner!
     error notOwner();
 
     modifier isOwner(address caller){
@@ -42,7 +42,7 @@ contract Ticket {
         _;
     }
 
-    constructor(address ticketBuyer, uint256 place) public {
+    constructor(address ticketBuyer, uint256 place) {
         owner = ticketBuyer;
         place_id = place;
         ticketingSystem = msg.sender;
@@ -69,17 +69,17 @@ contract CinemaTicketingSystem {
 
 
     function buyTicket(uint256 place) public {
-        // require (_tickets[msg.sender] == Ticket(0));
+        require (_tickets[msg.sender] == Ticket(address(0)));
         _tickets[msg.sender] = new Ticket(msg.sender, place);
     }
 
     function changePlace(uint new_place) public {
-        // require (_tickets[msg.sender] != Ticket(0));
+        require (_tickets[msg.sender] != Ticket(address(0)));
         Ticket(_tickets[msg.sender]).changePlace(msg.sender, new_place);
     }
 
     function getPlace(address account) public view returns (uint256) {
-        // require (_tickets[account] != Ticket(0));
+        require (_tickets[account] != Ticket(address(0)));
         return (_tickets[account].getPlaceID());
     }
 
