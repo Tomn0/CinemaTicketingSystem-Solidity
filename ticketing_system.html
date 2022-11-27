@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Buyer</title>
+    <title>Ticketing system</title>
 
     <link rel="stylesheet" type="text/css" href="main.css">
 
@@ -14,74 +14,40 @@
 <body>
     <div class="container">
 
-        <div class="buyer">
           <div class="centered">
             <h1>Cinema Ticketing System</h1>
-            <label for="cli_addr">Client address</label>
-            <input id="cli_addr" label="cli_addr" type="text" value="">
+
+            <h2 id="Item X">Movies</h2>
+            <label for="movies_list">List of movies</label>
             <div id="movies_list">
-              <h2 id="Item X">Movies</h2>
-              <label for="movies">Choose a movie:</label>
+              <ul>movie1</ul>
             </div>
-            <!-- <select name="movies" id="movies">
-              <option value="movie1">movie1</option>
-              <option value="movie2">movie2</option>
-              <option value="movie3">movie3</option>
-              <option value="movie4">movie4</option>
-            </select> -->
-            <div class="movie-selection-group">
-              <label for="movie1">movie1</label>
-              <input type="radio" id="movie1" name="movie_selection" movie_address="0xC0203A76565DfaadAfCb580f47AD8cA90252bd52" value="movie1">
-              <label for="movie2">movie2</label>
-              <input type="radio" id="movie2" name="movie_selection" movie_address="tu wstaw adresy kontraktów Movie" value="movie2">
-            </div>
-            
-            <h2 id="Item X">Free places</h2>
-            <select name="places" id="places">
-              <option value="20">Place 20</option>
-            </select>
-            <br>
-            <br>
 
-            <label for="amount">Amount</label>
-            <input id="amount" type="text" value="0">
-            <label for="amount">Wei</label>
-            
-            <!-- <div id=buyer_balance>Account balance: 0 Wei</div>
-            <label for="name" class="col-lg-2 control-label">Amount</label>-->
-    
-            <!-- <label for="name" class="col-lg-2 control-label">Confirm Item Received</label>
-            <input id="confirmItemReceived" type="text"> -->
-    
-            <button id="buyTicket">Buy Ticket</button>
-            <button id="confirmReceived">Change place</button>
+                       
+            <h2 id="Item X">Adding new movies</h2>
 
-            <h2 id="myplaces">My tickets</h2>
-            <select name="places" id="places">
-              <option value="20">Place 20</option>
-            </select>
+            <label for="title">Title</label>
+            <input id="title" label="title" type="text" value="Star Wars">
+            <label for="price">Price</label>
+            <input id="price" type="text" value="400">
+            <label for="maxSeats">maxSeats</label>
+            <input id="maxSeats" type="text" value="10">
+            <label for="date">date</label>
+            <input type="date" id="date" value="2022-01-01" min="2022-01-01" max="2023-12-31">
+
+
+            <button id="addMovie">Add Movie</button>
           </div>
-        </div>
-        
-        <!-- <div class="seller">
-          <div class="centered">
-            <h2>Seller</h2>
-            <div id=seller_balance>Account balance: 0 Wei</div>
-            <button id="abort">Abort</button>
-          </div>
-        </div> -->
-
-    </div>
+      </div>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 
     <script>
-
-      const maxPlaces = 10;
-
+      const default_hall_id = 10;
+      const default_hall_address = "przykładowy adres";
+      // const ticketing_system_addr =  ;
       const contract_addr = "0x41d6a35aaeAE8de6Bfd2f203aaf0A9c48d3Fd98d";
-      const seller_addr = "0x1b78Ec59483593eCB825fc58Ca246adcf25B7cEa";
-      const client_addr = "0xd403D564523cD34ABF245AFa9ee66e0ebAF2C29A";
+      const ticketing_system_addr = "0xe5B3dFB374F290DbbF83Ab4C853F677A0c795282";
       if (typeof web3 !== 'undefined') {
           web3 = new Web3(web3.currentProvider);
       } else {
@@ -346,24 +312,34 @@
 ]; // TODO: 
 
       var CinemaContract = new web3.eth.Contract(ABI, contract_addr, {});
-      web3.eth.defaultAccount = client_addr;
+      web3.eth.defaultAccount = contract_addr;
      
       // var Purchase = PurchaseContract.at('0x5B38Da6a701c568545dCfcB03FcB875f56beddC4');
       console.log(CinemaContract);
 
-      function getFreePlaces() {
-        console.log("Looking for free places");
-        for (let id = 0; id < maxPlaces; id++) {
-          $.when(CinemaContract.methods.checkSeat(id, $("input[name='movie_selection']:checked").attr("movie_address")).call()).done(function (isReserved) {
-            console.log("Is " + id + " reserved: ", isReserved);
-            if (!isReserved) {
-              $('#places').append($('<option>', {
-                  value: id,
-                  text: id
-              }));
-            }
+
+      // TODO: help https://bitsofco.de/calling-smart-contract-functions-using-web3-js-call-vs-send/ 
+
+      $(document).ready(function(){
+        $('#inputFormBasic label').click(function() {
+            alert('You clicked a label named ' + $(this).html() +'!');
+        });
+      });  
+
+      
+      // update movies list
+      const moviesListTimeout = setTimeout(getMoviesList, 5000);
+
+
+      function getMoviesList() {
+        console.log("Looking for movies");
+        $.when(CinemaContract.methods.getAllMovies().call()).done(function (movies) {
+          console.log(movies);
+          $.each(movies, function(i) {
+            console.log(movies[i]);
+            $('#movies_list').append('<ul>'  + movies[i] + '</ul>')
           });
-        }
+        });
       }
 
       // get free places when a movie is chosed
@@ -372,13 +348,11 @@
       });
 
 
-      // TODO: help https://bitsofco.de/calling-smart-contract-functions-using-web3-js-call-vs-send/ 
 
-      
-      // TODO: automatically load amount when movie is selected
-      // when buyTicket clicked
-      $("#buyTicket").click(function() {        
-        CinemaContract.methods.buyTicket($("#places").val(), $("input[name='movie_selection']:checked").attr("movie_address")).send({from: $("#cli_addr").val(), gas: 3000000, value: $("#amount").val()}, function(err, res){console.log(res);});
+
+      // when addMovie clicked
+      $("#addMovie").click(function() {        
+        CinemaContract.methods.addMovie($("#title").val(), $("#date").val(), $("#maxSeats").val(), default_hall_id, default_hall_address, $("#price").val(),).send({from: ticketing_system_addr, gas: 3000000, value: $("#amount").val()}, function(err, res){console.log(res);});
         // getBuyerBalance();
       });
 
