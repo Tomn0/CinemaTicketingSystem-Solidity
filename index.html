@@ -30,10 +30,10 @@
               <option value="movie4">movie4</option>
             </select> -->
             <div id="movies_selection" class="movie-selection-group">
-              <label for="movie1">movie1</label>
+              <!-- <label for="movie1">movie1</label>
               <input type="radio" id="movie1" name="movie_selection" movie_address="0xC0203A76565DfaadAfCb580f47AD8cA90252bd52" value="movie1">
               <label for="movie2">movie2</label>
-              <input type="radio" id="movie2" name="movie_selection" movie_address="tu wstaw adresy kontraktów Movie" value="movie2">
+              <input type="radio" id="movie2" name="movie_selection" movie_address="tu wstaw adresy kontraktów Movie" value="movie2"> -->
             </div>
             
             <h2 id="Item X">Free places</h2>
@@ -44,7 +44,7 @@
             <br>
 
             <label for="amount">Amount</label>
-            <input id="amount" type="text" value="0">
+            <input id="amount" type="text" value="400">
             <label for="amount">Wei</label>
             
             <!-- <div id=buyer_balance>Account balance: 0 Wei</div>
@@ -54,12 +54,16 @@
             <input id="confirmItemReceived" type="text"> -->
     
             <button id="buyTicket">Buy Ticket</button>
+
             <button id="confirmReceived">Change place</button>
 
-            <h2 id="myplaces">My tickets</h2>
-            <select name="places" id="places">
+            <h2 id="my_tickets">My tickets</h2>
+						<button id="updateTickets">Update Tickets</button>
+						<div id="tickets_list">					
+						</div>
+            <!-- <select name="places" id="places">
               <!-- <option value="20">Place 20</option> -->
-            </select>
+            </select> -->
           </div>
         </div>
         
@@ -387,6 +391,22 @@
         }
       }
 
+			function get_() {
+				$.when(CinemaContract.methods.getTickets($("#cli_addr").val()).call()).done(function (client_tickets) {
+					console.log("My tickets:")
+					console.log(client_tickets);
+					$("#tickets_list").empty()
+					for (i in client_tickets) {
+						$("#tickets_list").append('<ul>'  + client_tickets[i] + '</ul>');
+					} 
+				});
+
+			}
+
+			$("#updateTickets").click(() => {
+				get_();	
+			})
+
       $(document).on("change", "input[name='movie_selection']", function(){
         getFreePlaces()
 				selected_movie = $("input[name='movie_selection']:checked").attr("movie_address")
@@ -399,7 +419,6 @@
       // when buyTicket clicked
       $("#buyTicket").click(function() {        
         CinemaContract.methods.buyTicket($("#places").val(), selected_movie).send({from: $("#cli_addr").val(), gas: 3000000, value: $("#amount").val()}, function(err, res){console.log(res);});
-        // getBuyerBalance();
       });
 
    </script>
