@@ -29,7 +29,7 @@
               <option value="movie3">movie3</option>
               <option value="movie4">movie4</option>
             </select> -->
-            <div class="movie-selection-group">
+            <div id="movies_selection" class="movie-selection-group">
               <label for="movie1">movie1</label>
               <input type="radio" id="movie1" name="movie_selection" movie_address="0xC0203A76565DfaadAfCb580f47AD8cA90252bd52" value="movie1">
               <label for="movie2">movie2</label>
@@ -38,7 +38,7 @@
             
             <h2 id="Item X">Free places</h2>
             <select name="places" id="places">
-              <option value="20">Place 20</option>
+              <!-- <option value="20">Place 20</option> -->
             </select>
             <br>
             <br>
@@ -58,7 +58,7 @@
 
             <h2 id="myplaces">My tickets</h2>
             <select name="places" id="places">
-              <option value="20">Place 20</option>
+              <!-- <option value="20">Place 20</option> -->
             </select>
           </div>
         </div>
@@ -78,10 +78,9 @@
     <script>
 
       const maxPlaces = 10;
-
-      const contract_addr = "0x41d6a35aaeAE8de6Bfd2f203aaf0A9c48d3Fd98d";
-      const seller_addr = "0x1b78Ec59483593eCB825fc58Ca246adcf25B7cEa";
-      const client_addr = "0xd403D564523cD34ABF245AFa9ee66e0ebAF2C29A";
+			let selected_movie = "";
+      const contract_addr = "0x654F5662801b962B7BdF50F1fB62902C1eB2E4f1";
+      const client_addr = "0x3FdF5849e8222e577a01d7a78A33CAA31F7bD80D";
       if (typeof web3 !== 'undefined') {
           web3 = new Web3(web3.currentProvider);
       } else {
@@ -351,6 +350,28 @@
       // var Purchase = PurchaseContract.at('0x5B38Da6a701c568545dCfcB03FcB875f56beddC4');
       console.log(CinemaContract);
 
+
+      // update movies list
+      const moviesListTimeout = setInterval(getMoviesList, 5000);
+
+      function getMoviesList() {
+        console.log("Looking for movies");
+        $.when(CinemaContract.methods.getAllMovies().call()).done(function (movies) {
+          console.log(movies);
+					$('#movies_selection').empty()
+          $.each(movies, function(i) {
+            console.log(movies[i]);
+            $('#movies_selection').append('<label for="' + movies[i] + '">'  + movies[i] + '</label>');
+            $('#movies_selection').append(`<input type="radio" id="movie1" name="movie_selection" movie_address="${movies[i]}" value="movie1">`);
+            // $('#movies_selection').append('<input type="radio" id="' + movies[i] + '" name="movie_selection" movie_address="' + movies[i] + '" value="' + movies[i] + '"');
+
+            // <label for="movie1">movie1</label>
+            // <input type="radio" id="movie1" name="movie_selection" movie_address="0xC0203A76565DfaadAfCb580f47AD8cA90252bd52" value="movie1"> 
+
+          });
+        });
+      }
+
       function getFreePlaces() {
         console.log("Looking for free places");
         for (let id = 0; id < maxPlaces; id++) {
@@ -366,11 +387,10 @@
         }
       }
 
-      // get free places when a movie is chosed
-      $("input[name='movie_selection']").change(function(){
+      $(document).on("change", "input[name='movie_selection']", function(){
         getFreePlaces()
+				selected_movie = $("input[name='movie_selection']:checked").attr("movie_address")
       });
-
 
       // TODO: help https://bitsofco.de/calling-smart-contract-functions-using-web3-js-call-vs-send/ 
 
@@ -378,7 +398,7 @@
       // TODO: automatically load amount when movie is selected
       // when buyTicket clicked
       $("#buyTicket").click(function() {        
-        CinemaContract.methods.buyTicket($("#places").val(), $("input[name='movie_selection']:checked").attr("movie_address")).send({from: $("#cli_addr").val(), gas: 3000000, value: $("#amount").val()}, function(err, res){console.log(res);});
+        CinemaContract.methods.buyTicket($("#places").val(), selected_movie).send({from: $("#cli_addr").val(), gas: 3000000, value: $("#amount").val()}, function(err, res){console.log(res);});
         // getBuyerBalance();
       });
 

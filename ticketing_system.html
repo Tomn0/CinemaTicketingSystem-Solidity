@@ -20,7 +20,7 @@
             <h2 id="Item X">Movies</h2>
             <label for="movies_list">List of movies</label>
             <div id="movies_list">
-              <ul>movie1</ul>
+              <!-- <ul>movie1</ul> -->
             </div>
 
                        
@@ -45,9 +45,8 @@
     <script>
       const default_hall_id = 10;
       const default_hall_address = "przykładowy adres";
-      // const ticketing_system_addr =  ;
-      const contract_addr = "0x41d6a35aaeAE8de6Bfd2f203aaf0A9c48d3Fd98d";
-      const ticketing_system_addr = "0xe5B3dFB374F290DbbF83Ab4C853F677A0c795282";
+      const contract_addr = "0x654F5662801b962B7BdF50F1fB62902C1eB2E4f1";
+      const ticketing_system_owner = "0xe7EC8CF06e82f730b68Ad6F9454C79b079D04B22";
       if (typeof web3 !== 'undefined') {
           web3 = new Web3(web3.currentProvider);
       } else {
@@ -312,7 +311,7 @@
 ]; // TODO: 
 
       var CinemaContract = new web3.eth.Contract(ABI, contract_addr, {});
-      web3.eth.defaultAccount = contract_addr;
+      web3.eth.defaultAccount = ticketing_system_owner;
      
       // var Purchase = PurchaseContract.at('0x5B38Da6a701c568545dCfcB03FcB875f56beddC4');
       console.log(CinemaContract);
@@ -328,13 +327,14 @@
 
       
       // update movies list
-      const moviesListTimeout = setTimeout(getMoviesList, 5000);
+      const moviesListTimeout = setInterval(getMoviesList, 5000);
 
 
       function getMoviesList() {
         console.log("Looking for movies");
         $.when(CinemaContract.methods.getAllMovies().call()).done(function (movies) {
           console.log(movies);
+					$('#movies_list').empty()
           $.each(movies, function(i) {
             console.log(movies[i]);
             $('#movies_list').append('<ul>'  + movies[i] + '</ul>')
@@ -342,18 +342,9 @@
         });
       }
 
-      // get free places when a movie is chosed
-      $("input[name='movie_selection']").change(function(){
-        getFreePlaces()
-      });
-
-
-
-
       // when addMovie clicked
       $("#addMovie").click(function() {        
-        CinemaContract.methods.addMovie($("#title").val(), $("#date").val(), $("#maxSeats").val(), default_hall_id, default_hall_address, $("#price").val(),).send({from: ticketing_system_addr, gas: 3000000, value: $("#amount").val()}, function(err, res){console.log(res);});
-        // getBuyerBalance();
+        CinemaContract.methods.addMovie($("#title").val(), $("#date").val(), $("#maxSeats").val(), default_hall_id, default_hall_address, $("#price").val(),).send({from: ticketing_system_owner, gas: 3000000, value: $("#amount").val()}, function(err, res){console.log(res);});
       });
 
    </script>
