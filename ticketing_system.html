@@ -43,10 +43,543 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 
     <script>
+						///////////////////////////////////////////
+			// Define ABI
+			// CinemaContractABI:
+			let CinemaContractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "title",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "date",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "placesCount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "hall",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "cinemaAddress",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			}
+		],
+		"name": "addMovie",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "place",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "movieAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "movieId",
+				"type": "uint256"
+			}
+		],
+		"name": "buyTicket",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "notOwner",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "buyer",
+		"outputs": [
+			{
+				"internalType": "address payable",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "contract Movie",
+				"name": "movie",
+				"type": "address"
+			}
+		],
+		"name": "checkMovieInformation",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "title",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "date",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "movieId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "hall",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "placesCount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "cinemaAddress",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "placeNumber",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "movieAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "movieId",
+				"type": "uint256"
+			}
+		],
+		"name": "checkSeat",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "contract Ticket",
+				"name": "ticket",
+				"type": "address"
+			}
+		],
+		"name": "getAllInformation",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "place",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "movieAddress",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getAllMovies",
+		"outputs": [
+			{
+				"internalType": "contract Movie[]",
+				"name": "",
+				"type": "address[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "contract Movie",
+				"name": "movie",
+				"type": "address"
+			}
+		],
+		"name": "getPrice",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "client",
+				"type": "address"
+			}
+		],
+		"name": "getTickets",
+		"outputs": [
+			{
+				"internalType": "contract Ticket[]",
+				"name": "",
+				"type": "address[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "movieId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "movies",
+		"outputs": [
+			{
+				"internalType": "contract Movie",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address payable",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "price",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "qty",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+
+			// MovieContractABI:
+			let MovieContractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_title",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_date",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_placesCount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_hall",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_cinemaAddress",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_movieId",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "notFree",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "cinemaAddress",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "date",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getMovieDetails",
+		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getPrice",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getmovieID",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "hall",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "placeNumber",
+				"type": "uint256"
+			}
+		],
+		"name": "isSeatFree",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "movieId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "placesCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "price",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "seatNumber",
+				"type": "uint256"
+			}
+		],
+		"name": "reserveSeat",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "title",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+			
+
+			///////////////////////////////////////////
       const default_hall_id = 10;
       const default_hall_address = "przykładowy adres";
-      const contract_addr = "0x654F5662801b962B7BdF50F1fB62902C1eB2E4f1";
-      const ticketing_system_owner = "0xe7EC8CF06e82f730b68Ad6F9454C79b079D04B22";
+      const contract_addr = "0xD261002F98943ba7136a44c8DDdC8030a02A4509";
+      const ticketing_system_owner = "0xA8D97806D0AF5331fc2918E0A53338Bced45730f";
       if (typeof web3 !== 'undefined') {
           web3 = new Web3(web3.currentProvider);
       } else {
@@ -56,6 +589,16 @@
       console.log(web3);
 
       var ABI = [
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "notOwner",
+		"type": "error"
+	},
 	{
 		"inputs": [
 			{
@@ -113,29 +656,6 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "client",
-				"type": "address"
-			}
-		],
-		"name": "getAllInformation",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"inputs": [],
-		"name": "notOwner",
-		"type": "error"
-	},
-	{
 		"inputs": [],
 		"name": "buyer",
 		"outputs": [
@@ -167,6 +687,35 @@
 				"internalType": "bool",
 				"name": "",
 				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "contract Ticket",
+				"name": "ticket",
+				"type": "address"
+			}
+		],
+		"name": "getAllInformation",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "place",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "movieAddress",
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -250,52 +799,6 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"components": [
-					{
-						"internalType": "address",
-						"name": "owner",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "place",
-						"type": "uint256"
-					},
-					{
-						"internalType": "address",
-						"name": "movieAddress",
-						"type": "address"
-					}
-				],
-				"internalType": "struct CinemaTicketingSystem.ticketInformation",
-				"name": "ticketInfo",
-				"type": "tuple"
-			}
-		],
-		"name": "printAllInformations",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "place",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "movieAddress",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "qty",
 		"outputs": [
@@ -308,9 +811,8 @@
 		"stateMutability": "view",
 		"type": "function"
 	}
-]; // TODO: 
-
-      var CinemaContract = new web3.eth.Contract(ABI, contract_addr, {});
+]
+      var CinemaContract = new web3.eth.Contract(CinemaContractABI, contract_addr, {});
       web3.eth.defaultAccount = ticketing_system_owner;
      
       // var Purchase = PurchaseContract.at('0x5B38Da6a701c568545dCfcB03FcB875f56beddC4');

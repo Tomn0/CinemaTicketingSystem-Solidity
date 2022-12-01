@@ -61,10 +61,10 @@ contract Ticket {
 
 
 contract CinemaTicketingSystem {
-
     mapping(address => Ticket[]) _tickets;
     Movie[] public movies;
     
+    uint public movieId;
     uint public price;
     uint public qty;
     address payable public buyer;
@@ -90,11 +90,11 @@ contract CinemaTicketingSystem {
         return (ticket.ticketOwner(),ticket.place_id(),ticket.movieAddress());
     }
 
-    function printAllInformations(ticketInformation memory ticketInfo) public view returns(address owner,
-        uint place,
-        address movieAddress){
-        return (ticketInfo.owner, ticketInfo.place, ticketInfo.movieAddress);
-    }
+    // function printAllInformations(ticketInformation memory ticketInfo) public view returns(address owner,
+    //     uint place,
+    //     address movieAddress){
+    //     return (ticketInfo.owner, ticketInfo.place, ticketInfo.movieAddress);
+    // }
 
     function getAllMovies() public view returns (Movie[] memory) {
         return movies;
@@ -104,12 +104,28 @@ contract CinemaTicketingSystem {
         return _tickets[client];
     }
 
-    function buyTicket(uint256 place, address movieAddress) public payable {
+    function getPrice(Movie movie) public view returns (uint256) {
+        // require (_tickets[account] != Ticket(0));
+        return (movie.getPrice());
+    }
+
+
+    function buyTicket(uint256 place, address movieAddress, uint movieId) public payable {
         // require (_tickets[msg.sender] == Ticket(0));
         require(msg.value == movies[0].price(), "Insufficient Balance");
         owner.transfer(msg.value);
         _tickets[msg.sender].push(new Ticket(msg.sender, place, movieAddress));
-        movies[0].reserveSeat(place);
+        Movie _movie;
+        for(uint i=0;i<movies.length;i++){
+            if(movies[i].movieId() == movieId){
+                _movie = movies[i];
+            }
+        }
+        _movie.reserveSeat(place);
+    }
+
+    function checkMovieInformation(Movie movie) public view returns(string memory title, string  memory date, uint movieId, uint price, uint hall, uint placesCount, string memory cinemaAddress){
+        return(movie.title(), movie.date(), movie.movieId(), movie.price(), movie.hall(), movie.placesCount(), movie.cinemaAddress());
     }
 
     // function changePlace(uint new_place) public {
@@ -127,11 +143,18 @@ contract CinemaTicketingSystem {
     // }
 
     function addMovie(string memory title, string memory date, uint placesCount, uint hall, string memory cinemaAddress, uint price) isOwner public  {
-        movies.push(new Movie(title, date, placesCount, hall, cinemaAddress, price));
+        movieId++;
+        movies.push(new Movie(title, date, placesCount, hall, cinemaAddress, price, movieId));
     }
 
-    function checkSeat(uint placeNumber, address movieAddress) public view returns(bool){
-        return movies[0].isSeatFree(placeNumber);
+    function checkSeat(uint placeNumber, address movieAddress,uint movieId) public view returns(bool){
+        Movie _movie;
+        for(uint i=0;i<movies.length;i++){
+            if(movies[i].movieId() == movieId){
+                _movie = movies[i];
+            }
+        }
+        return _movie.isSeatFree(placeNumber);
     }
 }
 
@@ -139,13 +162,15 @@ contract CinemaTicketingSystem {
 contract Movie {
     string public title;
     string public date;
+    uint public movieId;
     uint public price;
     uint public hall;
     uint public placesCount;
-    string cinemaAddress;
+    string public cinemaAddress;
     mapping(uint => bool) isReserved;
 
-    constructor(string memory _title, string memory _date, uint _placesCount, uint _hall, string memory _cinemaAddress, uint _price) {
+    constructor(string memory _title, string memory _date, uint _placesCount, uint _hall, string memory _cinemaAddress, uint _price, uint _movieId) {
+        movieId = _movieId;
         title = _title;
         date = _date;
         hall = _hall;
@@ -156,6 +181,31 @@ contract Movie {
             isReserved[i] = false;
         }
     }
+
+    // getters
+    function getMovieDetails() public view returns (string[] memory) {
+        string[] memory details = new string[] (2);
+        details[0] = title;
+        details[1] = date;
+        return details;
+    }
+
+    function getmovieID() public view returns (uint) {
+        return movieId;
+    }
+
+    // function getTitle() public view returns (string memory) {
+    //     return title;
+    // }
+
+    // function getDate() public view returns (string memory) {
+    //     return date;
+    // }
+
+    function getPrice() public view returns (uint) {
+        return price;
+    }
+
 
     function isSeatFree(uint placeNumber) public view returns(bool){
         return isReserved[placeNumber];

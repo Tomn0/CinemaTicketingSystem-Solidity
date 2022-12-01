@@ -80,20 +80,10 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 
     <script>
-
-      const maxPlaces = 10;
-			let selected_movie = "";
-      const contract_addr = "0x654F5662801b962B7BdF50F1fB62902C1eB2E4f1";
-      const client_addr = "0x3FdF5849e8222e577a01d7a78A33CAA31F7bD80D";
-      if (typeof web3 !== 'undefined') {
-          web3 = new Web3(web3.currentProvider);
-      } else {
-          // set the provider you want from Web3.providers
-          web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-      }
-      console.log(web3);
-
-      var ABI = [
+			///////////////////////////////////////////
+			// Define ABI
+			// CinemaContractABI:
+			let CinemaContractABI = [
 	{
 		"inputs": [
 			{
@@ -143,24 +133,16 @@
 				"internalType": "address",
 				"name": "movieAddress",
 				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "movieId",
+				"type": "uint256"
 			}
 		],
 		"name": "buyTicket",
 		"outputs": [],
 		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "client",
-				"type": "address"
-			}
-		],
-		"name": "getAllInformation",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -189,6 +171,55 @@
 	{
 		"inputs": [
 			{
+				"internalType": "contract Movie",
+				"name": "movie",
+				"type": "address"
+			}
+		],
+		"name": "checkMovieInformation",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "title",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "date",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "movieId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "hall",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "placesCount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "cinemaAddress",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "uint256",
 				"name": "placeNumber",
 				"type": "uint256"
@@ -197,6 +228,11 @@
 				"internalType": "address",
 				"name": "movieAddress",
 				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "movieId",
+				"type": "uint256"
 			}
 		],
 		"name": "checkSeat",
@@ -205,6 +241,35 @@
 				"internalType": "bool",
 				"name": "",
 				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "contract Ticket",
+				"name": "ticket",
+				"type": "address"
+			}
+		],
+		"name": "getAllInformation",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "place",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "movieAddress",
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -226,6 +291,25 @@
 	{
 		"inputs": [
 			{
+				"internalType": "contract Movie",
+				"name": "movie",
+				"type": "address"
+			}
+		],
+		"name": "getPrice",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "client",
 				"type": "address"
@@ -237,6 +321,19 @@
 				"internalType": "contract Ticket[]",
 				"name": "",
 				"type": "address[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "movieId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -288,52 +385,6 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"components": [
-					{
-						"internalType": "address",
-						"name": "owner",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "place",
-						"type": "uint256"
-					},
-					{
-						"internalType": "address",
-						"name": "movieAddress",
-						"type": "address"
-					}
-				],
-				"internalType": "struct CinemaTicketingSystem.ticketInformation",
-				"name": "ticketInfo",
-				"type": "tuple"
-			}
-		],
-		"name": "printAllInformations",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "place",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "movieAddress",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "qty",
 		"outputs": [
@@ -346,9 +397,237 @@
 		"stateMutability": "view",
 		"type": "function"
 	}
-]; // TODO: 
+]
 
-      var CinemaContract = new web3.eth.Contract(ABI, contract_addr, {});
+			// MovieContractABI:
+			let MovieContractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_title",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_date",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_placesCount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_hall",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_cinemaAddress",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_movieId",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "notFree",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "cinemaAddress",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "date",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getMovieDetails",
+		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getPrice",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getmovieID",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "hall",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "placeNumber",
+				"type": "uint256"
+			}
+		],
+		"name": "isSeatFree",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "movieId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "placesCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "price",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "seatNumber",
+				"type": "uint256"
+			}
+		],
+		"name": "reserveSeat",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "title",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+			
+			///////////////////////////////////////////
+      const maxPlaces = 10;
+			let selected_movie = "";
+      const contract_addr = "0xD261002F98943ba7136a44c8DDdC8030a02A4509";
+      const client_addr = "0x5344C710a9CcCA75b82cC82F593D2ecEe4c42EE1";
+			$("#cli_addr").val(client_addr)
+
+      if (typeof web3 !== 'undefined') {
+          web3 = new Web3(web3.currentProvider);
+      } else {
+          // set the provider you want from Web3.providers
+          web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+      }
+      console.log(web3);
+
+
+      var CinemaContract = new web3.eth.Contract(CinemaContractABI, contract_addr, {});
       web3.eth.defaultAccount = client_addr;
      
       // var Purchase = PurchaseContract.at('0x5B38Da6a701c568545dCfcB03FcB875f56beddC4');
@@ -360,26 +639,44 @@
 
       function getMoviesList() {
         console.log("Looking for movies");
+				let movies_list = [];
+				$('#movies_selection').empty()
         $.when(CinemaContract.methods.getAllMovies().call()).done(function (movies) {
-          console.log(movies);
-					$('#movies_selection').empty()
+          // console.log(movies);
+					
           $.each(movies, function(i) {
+						// create movie contract
+						let MovieContract = new web3.eth.Contract(MovieContractABI, movies[i], {});
             console.log(movies[i]);
-            $('#movies_selection').append('<label for="' + movies[i] + '">'  + movies[i] + '</label>');
-            $('#movies_selection').append(`<input type="radio" id="movie1" name="movie_selection" movie_address="${movies[i]}" value="movie1">`);
-            // $('#movies_selection').append('<input type="radio" id="' + movies[i] + '" name="movie_selection" movie_address="' + movies[i] + '" value="' + movies[i] + '"');
+						// let price, title, date;
+						$.when(MovieContract.methods.getMovieDetails().call()).done(function (res) {
+							console.log("Volia: " + res); 
+							$.when(MovieContract.methods.getPrice().call()).done(function (price) {
+								$('#movies_selection').append(`<label class="${movies[i]}" for="${movies[i]}">Title: ${res[0]}, date: ${res[1]}, price: ${price} Wei</label>`);
+            		$('#movies_selection').append(`<input type="radio" id="movie1" name="movie_selection" movie_address="${movies[i]}" value="movie1">`);
+							});
+						});
+						// $.when(MovieContract.methods.getPrice().call()).done(function (res) {console.log("Volia: " + res); $(`.movie-selection-group label`).append(price);});
+						// $.when(MovieContract.methods.getTitle().call()).done(function (res) {console.log("Volia: " + res); title = res});
+						// $.when(MovieContract.methods.getDate().call()).done(function (res) {console.log("Volia: " + res); date = res});
 
-            // <label for="movie1">movie1</label>
-            // <input type="radio" id="movie1" name="movie_selection" movie_address="0xC0203A76565DfaadAfCb580f47AD8cA90252bd52" value="movie1"> 
 
+						// $(`.movie-selection-group ${movies[i]}`).append(price);
+
+						// $.when(MovieContract.methods.getMovieDetails().call()).done(function (res) {console.log("Volia: " + res); });
           });
         });
       }
 
       function getFreePlaces() {
         console.log("Looking for free places");
+				$('#places').empty()
+				console.log($("input[name='movie_selection']:checked").attr("movie_address"))
+				var MovieContract = new web3.eth.Contract(MovieContractABI, $("input[name='movie_selection']:checked").attr("movie_address"), {});
+				
         for (let id = 0; id < maxPlaces; id++) {
-          $.when(CinemaContract.methods.checkSeat(id, $("input[name='movie_selection']:checked").attr("movie_address")).call()).done(function (isReserved) {
+					$.when(MovieContract.methods.getmovieID().call()).done(function (movieId) {
+						$.when(CinemaContract.methods.checkSeat(id, $("input[name='movie_selection']:checked").attr("movie_address"), movieId).call()).done(function (isReserved) {
             console.log("Is " + id + " reserved: ", isReserved);
             if (!isReserved) {
               $('#places').append($('<option>', {
@@ -388,10 +685,13 @@
               }));
             }
           });
+
+					});
+
         }
       }
 
-			function get_() {
+			function getMyTickets() {
 				$.when(CinemaContract.methods.getTickets($("#cli_addr").val()).call()).done(function (client_tickets) {
 					console.log("My tickets:")
 					console.log(client_tickets);
@@ -404,7 +704,7 @@
 			}
 
 			$("#updateTickets").click(() => {
-				get_();	
+				getMyTickets();	
 			})
 
       $(document).on("change", "input[name='movie_selection']", function(){
@@ -417,8 +717,14 @@
       
       // TODO: automatically load amount when movie is selected
       // when buyTicket clicked
-      $("#buyTicket").click(function() {        
-        CinemaContract.methods.buyTicket($("#places").val(), selected_movie).send({from: $("#cli_addr").val(), gas: 3000000, value: $("#amount").val()}, function(err, res){console.log(res);});
+      $("#buyTicket").click(function() {
+				var MovieContract = new web3.eth.Contract(MovieContractABI, selected_movie, {});
+				
+				$.when(MovieContract.methods.getmovieID().call()).done(function (movieId) {
+					CinemaContract.methods.buyTicket($("#places").val(), selected_movie, movieId).send({from: $("#cli_addr").val(), gas: 3000000, value: $("#amount").val()}, function(err, res){console.log(res);});
+				});
+
+        
       });
 
    </script>
