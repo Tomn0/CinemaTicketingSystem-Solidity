@@ -21,6 +21,7 @@
             <input id="cli_addr" label="cli_addr" type="text" value="">
             <div id="movies_list">
               <h2 id="Item X">Movies</h2>
+							<button id="getMoviesList">Update movies list</button>
               <label for="movies">Choose a movie:</label>
             </div>
             <!-- <select name="movies" id="movies">
@@ -635,7 +636,11 @@
 
 
       // update movies list
-      const moviesListTimeout = setInterval(getMoviesList, 5000);
+      // const moviesListTimeout = setInterval(getMoviesList, 5000);
+
+			$("#getMoviesList").click(() => {
+				getMoviesList();	
+			})
 
       function getMoviesList() {
         console.log("Looking for movies");
@@ -656,14 +661,6 @@
             		$('#movies_selection').append(`<input type="radio" id="movie1" name="movie_selection" movie_address="${movies[i]}" value="movie1">`);
 							});
 						});
-						// $.when(MovieContract.methods.getPrice().call()).done(function (res) {console.log("Volia: " + res); $(`.movie-selection-group label`).append(price);});
-						// $.when(MovieContract.methods.getTitle().call()).done(function (res) {console.log("Volia: " + res); title = res});
-						// $.when(MovieContract.methods.getDate().call()).done(function (res) {console.log("Volia: " + res); date = res});
-
-
-						// $(`.movie-selection-group ${movies[i]}`).append(price);
-
-						// $.when(MovieContract.methods.getMovieDetails().call()).done(function (res) {console.log("Volia: " + res); });
           });
         });
       }
@@ -671,7 +668,7 @@
       function getFreePlaces() {
         console.log("Looking for free places");
 				$('#places').empty()
-				console.log($("input[name='movie_selection']:checked").attr("movie_address"))
+				// console.log($("input[name='movie_selection']:checked").attr("movie_address"))
 				var MovieContract = new web3.eth.Contract(MovieContractABI, $("input[name='movie_selection']:checked").attr("movie_address"), {});
 				
         for (let id = 0; id < maxPlaces; id++) {
@@ -693,11 +690,19 @@
 
 			function getMyTickets() {
 				$.when(CinemaContract.methods.getTickets($("#cli_addr").val()).call()).done(function (client_tickets) {
-					console.log("My tickets:")
-					console.log(client_tickets);
+					// console.log("My tickets:")
+					// console.log(client_tickets);
 					$("#tickets_list").empty()
-					for (i in client_tickets) {
-						$("#tickets_list").append('<ul>'  + client_tickets[i] + '</ul>');
+					console.log(client_tickets)
+
+					for (let client_ticket of client_tickets) {
+						$.when(CinemaContract.methods.getAllInformation(client_ticket).call()).done( (res) => {
+							
+							$.when(CinemaContract.methods.checkMovieInformation(res[2]).call()).done(function (info) {
+								console.log("Informations: ", info);
+								$("#tickets_list").append(`<ul>Address: <b>${client_ticket}</b>, Title: <b>${info[0]}</b>, Date: <b>${info[1]}</b>, Price: <b>${info[3]} Wei</b>, Hall: <b>${info[4]}</b>, Place number: <b>${res[1]}, </b>Cinema address: <b>${info[6]}</b></ul>`);
+							})
+						});						
 					} 
 				});
 

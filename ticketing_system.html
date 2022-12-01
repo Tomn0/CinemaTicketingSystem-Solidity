@@ -832,14 +832,39 @@
       const moviesListTimeout = setInterval(getMoviesList, 5000);
 
 
-      function getMoviesList() {
+      // function getMoviesList() {
+      //   console.log("Looking for movies");
+      //   $.when(CinemaContract.methods.getAllMovies().call()).done(function (movies) {
+      //     console.log(movies);
+			// 		$('#movies_list').empty()
+      //     $.each(movies, function(i) {
+      //       console.log(movies[i]);
+      //       $('#movies_list').append('<ul>'  + movies[i] + '</ul>')
+      //     });
+      //   });
+      // }
+
+			function getMoviesList() {
         console.log("Looking for movies");
+				let movies_list = [];
+				$('#movies_list').empty()
         $.when(CinemaContract.methods.getAllMovies().call()).done(function (movies) {
-          console.log(movies);
-					$('#movies_list').empty()
+          // console.log(movies);
+					
           $.each(movies, function(i) {
+						// create movie contract
+						let MovieContract = new web3.eth.Contract(MovieContractABI, movies[i], {});
             console.log(movies[i]);
-            $('#movies_list').append('<ul>'  + movies[i] + '</ul>')
+						// let price, title, date;
+						$.when(MovieContract.methods.getMovieDetails().call()).done(function (res) {
+							console.log("Volia: " + res); 
+							$.when(MovieContract.methods.getPrice().call()).done(function (price) {
+								$('#movies_list').append(`<ul>Title: ${res[0]}, date: ${res[1]}, price: ${price} Wei</ul>`)
+
+								// $('#movies_list').append(`<label class="${movies[i]}" for="${movies[i]}">Title: ${res[0]}, date: ${res[1]}, price: ${price} Wei</label>`);
+            		// $('#movies_list').append(`<input type="radio" id="movie1" name="movie_selection" movie_address="${movies[i]}" value="movie1">`);
+							});
+						});
           });
         });
       }
